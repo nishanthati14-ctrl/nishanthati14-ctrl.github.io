@@ -24,6 +24,6 @@ I am a Data Science student interested in exploring intelligent systems, machine
 
 ### 🤝 Connect
 
-- GitHub: https://github.com/YOUR-USERNAME
-- LinkedIn: YOUR-LINKEDIN-PROFILE-URL
+- GitHub: https://github.com/nishanthati14-ctrl
+- LinkedIn: www.linkedin.com/in/nishant-kumar-hati-416b7b296
 - Portfolio: https://YOUR-USERNAME.github.io
