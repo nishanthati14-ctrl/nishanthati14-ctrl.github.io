@@ -8,7 +8,7 @@ I am a Data Science student interested in exploring intelligent systems, machine
 
 ### 🌐 Personal Portfolio
 
-**[Explore My Portfolio](https://YOUR-USERNAME.github.io)**
+**[Explore My Portfolio](https://nishanthati14-ctrl.github.io/)**
 
 ### 🔬 Areas of Interest
 - Machine Learning & Deep Learning
@@ -26,4 +26,4 @@ I am a Data Science student interested in exploring intelligent systems, machine
 
 - GitHub: https://github.com/nishanthati14-ctrl
 - LinkedIn: www.linkedin.com/in/nishant-kumar-hati-416b7b296
-- Portfolio: https://YOUR-USERNAME.github.io
+- Portfolio: https://nishanthati14-ctrl.github.io/
