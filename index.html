@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nishant Kumar Hati — AI & Deep Learning Research OS</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#030306] text-zinc-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+
+  <!-- Ambient Architectural Grid & Dynamic Cursor Spotlight -->
+  <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+  <div id="mouse-spotlight" class="fixed inset-0 pointer-events-none z-0"></div>
+
+  <!-- 24 Nameless Autonomous Swarm Cursors Layer -->
+  <div id="swarm-layer" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+
+  <!-- Top Swarm Construction Progress HUD -->
+  <div id="build-status-banner" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-700">
+    <div class="px-6 py-2.5 rounded-full bg-[#05070e]/95 border border-cyan-400/50 backdrop-blur-2xl shadow-[0_0_40px_rgba(6,182,212,0.3)] flex items-center gap-3.5">
+      <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+      <span id="build-stage-text" class="font-mono text-xs tracking-widest text-cyan-300 uppercase">
+        SWARM_ORCHESTRATOR // 24 AUTONOMOUS CURSORS IN ORBIT...
+      </span>
+      <span id="build-pct" class="font-mono text-xs font-bold text-white pl-2 border-l border-white/15">0%</span>
+    </div>
+  </div>
+
+  <!-- Voice Wake-Word Status Pill (Bottom Left) -->
+  <div id="voice-sensor-pill" onclick="enableHandsFreeVoice()" class="fixed bottom-5 left-5 z-40 cursor-pointer group">
+    <div class="px-4 py-2.5 rounded-full bg-[#060913]/90 border border-cyan-500/40 hover:border-cyan-400 backdrop-blur-xl shadow-[0_0_25px_rgba(6,182,212,0.2)] flex items-center gap-3 transition">
+      <span id="mic-pulse-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+      <div class="font-mono text-[11px]">
+        <span id="mic-sensor-text" class="text-cyan-300 font-semibold">CLICK TO ARM MIC · SAY "HELLO JARVIS"</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       FULL-SCREEN HOLOGRAPHIC J.A.R.V.I.S. OS OVERLAY
+       ================================================================= -->
+  <div id="jarvis-hud-overlay" class="fixed inset-0 z-[100] bg-[#02050a]/90 backdrop-blur-2xl hidden flex-col items-center justify-between p-6 sm:p-10 select-none overflow-hidden">
+    
+    <div class="hud-scanlines pointer-events-none"></div>
+    <div class="hud-corner top-6 left-6 border-t-2 border-l-2"></div>
+    <div class="hud-corner top-6 right-6 border-t-2 border-r-2"></div>
+    <div class="hud-corner bottom-6 left-6 border-b-2 border-l-2"></div>
+    <div class="hud-corner bottom-6 right-6 border-b-2 border-r-2"></div>
+
+    <!-- Top HUD Telemetry Bar -->
+    <div class="w-full max-w-6xl flex flex-wrap items-center justify-between gap-4 z-10 border-b border-cyan-500/25 pb-4">
+      <div class="flex items-center gap-3">
+        <div class="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></div>
+        <div>
+          <div class="font-orbitron text-sm sm:text-base font-bold tracking-[0.25em] text-cyan-300">
+            J.A.R.V.I.S. // STARK HOLOGRAPHIC COMMAND OS
+          </div>
+          <div class="font-mono text-[10px] text-cyan-500/80 tracking-widest">
+            JUST A RATHER VERY INTELLIGENT SYSTEM · NISHANT KUMAR HATI NEURAL INTERFACE
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 font-mono text-xs">
+        <div class="hidden sm:block text-right">
+          <div class="text-cyan-400">SYS_INTEGRITY: 99.98%</div>
+          <div id="jarvis-voice-profile" class="text-[10px] text-zinc-400">VOICE: DEEP BRITISH BARITONE</div>
+        </div>
+        <button onclick="deactivateJarvisHud()" class="px-4 py-2 rounded-lg border border-cyan-400/40 bg-cyan-500/10 hover:bg-rose-500/20 hover:border-rose-400 text-cyan-200 font-mono text-xs tracking-wider transition">
+          [ESC] STAND DOWN
+        </button>
+      </div>
+    </div>
+
+    <!-- Centerpiece: Holographic Arc Core & Side Telemetry -->
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto z-10">
+      
+      <!-- Left Telemetry (3 Cols) -->
+      <div class="hidden lg:flex lg:col-span-3 flex-col space-y-4 font-mono text-xs border-l-2 border-cyan-500/30 pl-4">
+        <div class="text-cyan-400 font-bold tracking-widest uppercase">01 // BIOMETRIC & ID</div>
+        <div class="space-y-1 text-[11px] text-zinc-300">
+          <div>SUBJECT: <span class="text-white">NISHANT KUMAR HATI</span></div>
+          <div>DEGREE: <span class="text-cyan-300">M.Sc. Data Science</span></div>
+          <div>INSTITUTE: <span class="text-zinc-400">Amity Univ. Rajasthan</span></div>
+          <div>ORCID: <span class="text-emerald-400">0009-0008-1336-3544</span></div>
+          <div>LEADERSHIP: <span class="text-amber-300">Founding Coord. DEXA</span></div>
+          <div>RANK: <span class="text-rose-400">Shodan (1st Deg Black Belt)</span></div>
+        </div>
+
+        <div class="text-cyan-400 font-bold tracking-widest uppercase pt-3">02 // ACTIVE MANUSCRIPTS</div>
+        <div class="space-y-2 text-[11px]">
+          <div class="p-2.5 rounded bg-cyan-500/10 border border-cyan-500/25">
+            <div class="text-cyan-300 font-bold">SER · Springer Nature (IJST)</div>
+            <div class="text-zinc-400">1D CNN+Attn: 91.67% Acc (IESC)</div>
+          </div>
+          <div class="p-2.5 rounded bg-emerald-500/10 border border-emerald-500/25">
+            <div class="text-emerald-300 font-bold">FLORA · PlantVillage (54,305)</div>
+            <div class="text-zinc-400">ResNet50: 95.15% Acc · 92.98% F1</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Holographic Arc Core (6 Cols) -->
+      <div class="lg:col-span-6 flex flex-col items-center justify-center relative">
+        <div id="jarvis-holo-core" class="relative w-72 h-72 sm:w-96 sm:h-96 flex items-center justify-center">
+          <svg class="absolute inset-0 w-full h-full animate-spin-slow text-cyan-400/40" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="94" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="14 6 4 6" />
+            <circle cx="100" cy="100" r="88" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 8" />
+          </svg>
+
+          <svg class="absolute inset-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)] animate-spin-reverse text-cyan-300/70" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="82" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="45 25 15 25" />
+            <circle cx="100" cy="100" r="72" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="8 12" />
+          </svg>
+
+          <svg id="jarvis-inner-svg" class="absolute inset-10 w-[calc(100%-5rem)] h-[calc(100%-5rem)] animate-spin-medium text-sky-400" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="64" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="12 8" />
+            <circle cx="100" cy="100" r="50" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="30 15" />
+          </svg>
+
+          <div id="jarvis-core-Variables" class="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-cyan-500/15 border-2 border-cyan-300 shadow-[0_0_60px_rgba(34,211,238,0.6)] flex flex-col items-center justify-center text-center p-4">
+            <div class="font-orbitron text-xs sm:text-sm font-black tracking-[0.2em] text-white">J.A.R.V.I.S.</div>
+            <div id="jarvis-hud-mode" class="font-mono text-[10px] text-cyan-300 mt-1 uppercase tracking-widest">ONLINE</div>
+            <div id="jarvis-core-eq" class="flex items-end justify-center gap-1 h-7 mt-2">
+              <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+              <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+              <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 max-w-2xl text-center space-y-2 px-4">
+          <div id="jarvis-user-transcript" class="font-mono text-xs text-cyan-400/80 uppercase tracking-widest min-h-[18px]">
+            VOICE COMMAND CHANNEL OPEN — SPEAK NATURALLY
+          </div>
+          <p id="jarvis-spoken-subtitle" class="font-mono text-sm sm:text-base text-white leading-relaxed drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]">
+            "Good evening, Sir. All twenty-four autonomous build cursors and neural research modules are online. How shall we proceed?"
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Voice Directives (3 Cols) -->
+      <div class="lg:col-span-3 flex flex-col space-y-3 font-mono text-xs border-r-2 border-cyan-500/30 pr-4">
+        <div class="text-cyan-400 font-bold tracking-widest uppercase">03 // VOICE DIRECTIVES (SPEAK OR CLICK)</div>
+        <button onclick="executeJarvisCommand('who is nishant')" class="hud-directive-btn">"Jarvis, who is Nishant?"</button>
+        <button onclick="executeJarvisCommand('explain speech emotion')" class="hud-directive-btn">"Analyze Speech Emotion Paper"</button>
+        <button onclick="executeJarvisCommand('explain flora plant')" class="hud-directive-btn">"Show FLORA & Grad-CAM Visuals"</button>
+        <button onclick="executeJarvisCommand('machine learning practicals')" class="hud-directive-btn">"Inspect ML Practicals & Code"</button>
+        <button onclick="executeJarvisCommand('karate and dexa')" class="hud-directive-btn">"DEXA Club & Shodan Black Belt"</button>
+        <button onclick="executeJarvisCommand('launch autopilot tour')" class="hud-directive-btn text-emerald-300 border-emerald-500/30">▶ "Launch Autopilot Tour"</button>
+        <button onclick="executeJarvisCommand('stand down')" class="hud-directive-btn text-rose-300 border-rose-500/30">"Stand down / Close HUD"</button>
+      </div>
+
+    </div>
+
+    <!-- Bottom HUD Voice Bar -->
+    <div class="w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-cyan-500/25 pt-4 z-10 font-mono text-xs">
+      <div class="flex items-center gap-3">
+        <button id="hud-mic-trigger" onclick="triggerManualVoiceListen()" class="px-4 py-2 rounded-full bg-cyan-500/20 hover:bg-cyan-500/35 border border-cyan-400 text-cyan-200 flex items-center gap-2 transition shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+          <span class="w-2 h-2 rounded-full bg-cyan-300 animate-ping"></span>
+          <span>SPEAK COMMAND NOW</span>
+        </button>
+        <span class="text-zinc-500 hidden md:inline">Wake phrase active: "Hello Jarvis"</span>
+      </div>
+      <div class="text-cyan-500/70 text-[11px]">
+        100% LOCAL NEURAL GRAPH // ZERO API KEYS REQUIRED
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sticky Navigation Header -->
+  <header data-build-order="1" class="build-block sticky top-3 z-40 max-w-7xl mx-auto px-4">
+    <div class="bg-[#070910]/85 border border-white/[0.09] backdrop-blur-2xl rounded-2xl px-5 py-3 flex flex-wrap items-center justify-between gap-4 shadow-2xl">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_12px_#22d3ee]"></div>
+        <span class="font-mono text-xs font-bold tracking-wider text-white">NISHANT KUMAR HATI</span>
+        <span class="hidden md:inline text-zinc-700">|</span>
+        <a href="https://orcid.org/0009-0008-1336-3544" target="_blank" class="hidden md:inline font-mono text-[11px] text-emerald-400 hover:underline">
+          ORCID: 0009-0008-1336-3544 ↗
+        </a>
+      </div>
+
+      <nav class="hidden xl:flex items-center gap-6 text-xs font-medium text-zinc-400">
+        <a href="#hero" class="hover:text-white transition">01. Identity</a>
+        <a href="#ser-section" class="hover:text-white transition">02. SER Study (Springer)</a>
+        <a href="#flora-section" class="hover:text-white transition">03. FLORA Visual Lab</a>
+        <a href="#ml-section" class="hover:text-white transition">04. ML Practicals & Web</a>
+        <a href="#leadership-section" class="hover:text-white transition">05. DEXA & Shodan</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button onclick="SummonJarvisHud()" class="font-orbitron text-[11px] px-3.5 py-1.5 rounded-xl border border-cyan-400/50 bg-cyan-500/15 hover:bg-cyan-500/30 text-cyan-200 transition shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-cyan-300 animate-ping"></span>
+          <span>J.A.R.V.I.S. OS</span>
+        </button>
+        <button id="replay-build-btn" class="font-mono text-[11px] px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 transition">
+          ↻ Slow Build
+        </button>
+        <button id="toggle-swarm-btn" class="font-mono text-[11px] px-3 py-1.5 rounded-xl border border-white/10 bg-white/[0.03] text-zinc-400 hover:text-white transition">
+          24 Cursors: ON
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Portfolio Workspace (23 Build Blocks) -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-32 space-y-28 relative z-10">
+
+    <!-- ==========================================
+         SECTION 1: HERO IDENTITY & METRICS BENTO
+         ========================================== -->
+    <section id="hero" class="relative pt-2">
+      
+      <div data-build-order="2" class="build-block text-center select-none overflow-hidden pointer-events-none mb-2">
+        <h1 class="hero-watermark">PORTFOLIO</h1>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 -mt-6 sm:-mt-16">
+        
+        <div data-build-order="3" class="build-block lg:col-span-8 bento-card p-8 sm:p-10 rounded-3xl flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="font-hand text-3xl sm:text-4xl text-zinc-200 mr-1">Hello, I'm</span>
+              <span class="font-mono text-[11px] px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                M.Sc. Data Science @ Amity University Rajasthan
+              </span>
+              <span class="font-mono text-[11px] px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">
+                Founding General Coordinator · DEXA Club
+              </span>
+            </div>
+
+            <h2 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.04]">
+              NISHANT KUMAR HATI
+            </h2>
+
+            <p class="font-mono text-xs sm:text-sm text-cyan-400">
+              AI & Deep Learning Researcher · Computer Vision · Speech Emotion Recognition (SER) · Explainable AI (XAI)
+            </p>
+
+            <p class="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-3xl">
+              I explore deep neural architectures (<strong class="text-white">1D CNN+Attention, LSTM, BiLSTM, ResNet50, MobileNetV2, EfficientNetB0, DenseNet121, and CNN-ViT hybrids</strong>) and how AI models learn and make decisions. My research combines high classification accuracy with multi-level human-interpretable explanations using <strong class="text-white">SHAP, LIME, Grad-CAM, and Temporal Attention Heatmaps</strong>.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="SummonJarvisHud()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-bold text-xs sm:text-sm transition shadow-[0_0_30px_rgba(6,182,212,0.4)] flex items-center gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-black animate-ping"></span>
+              Say "Hello Jarvis" or Launch Voice OS
+            </button>
+            <a href="https://orcid.org/0009-0008-1336-3544" target="_blank" class="px-4 py-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 font-mono text-xs text-emerald-300 transition">
+              ORCID: 0009-0008-1336-3544 ↗
+            </a>
+            <a href="https://github.com/nishanthati14-ctrl" target="_blank" class="px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] font-mono text-xs text-zinc-200 transition">
+              GitHub (@nishanthati14-ctrl) ↗
+            </a>
+            <a href="https://www.linkedin.com/in/nishant-kumar-hati-416b7b296" target="_blank" class="px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] font-mono text-xs text-zinc-200 transition">
+              LinkedIn (2,179+ Followers) ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 grid grid-cols-2 gap-4">
+          <div data-build-order="4" class="build-block bento-card p-5 rounded-3xl flex flex-col justify-between">
+            <span class="font-mono text-[10px] text-cyan-400 uppercase">FLORA_RESNET50</span>
+            <div class="my-2">
+              <div class="text-3xl font-black text-white">95.15%</div>
+              <div class="text-[11px] font-mono text-emerald-400 mt-0.5">92.98% Macro F1</div>
+            </div>
+            <p class="text-[11px] text-zinc-400">54,305 PlantVillage RGB images across 38 classes.</p>
+          </div>
+
+          <div data-build-order="5" class="build-block bento-card p-5 rounded-3xl flex flex-col justify-between">
+            <span class="font-mono text-[10px] text-indigo-400 uppercase">SER_SPRINGER_IJST</span>
+            <div class="my-2">
+              <div class="text-3xl font-black text-white">91.67%</div>
+              <div class="text-[11px] font-mono text-indigo-300 mt-0.5">1D CNN + Attention</div>
+            </div>
+            <p class="text-[11px] text-zinc-400">10 architectures tested on 600 IESC utterances.</p>
+          </div>
+
+          <div data-build-order="6" class="build-block bento-card p-5 rounded-3xl flex flex-col justify-between">
+            <span class="font-mono text-[10px] text-amber-400 uppercase">ACOUSTIC_TENSOR</span>
+            <div class="my-2">
+              <div class="text-3xl font-black text-white">150×68</div>
+              <div class="text-[11px] font-mono text-amber-300 mt-0.5">68 Librosa Features</div>
+            </div>
+            <p class="text-[11px] text-zinc-400">40 MFCC, 12 Chroma, 7 Contrast, 6 Tonnetz, ZCR, RMS, F0.</p>
+          </div>
+
+          <div data-build-order="7" class="build-block bento-card p-5 rounded-3xl flex flex-col justify-between">
+            <span class="font-mono text-[10px] text-rose-400 uppercase">GOJU-RYU_KARATE</span>
+            <div class="my-2">
+              <div class="text-3xl font-black text-white">Shodan</div>
+              <div class="text-[11px] font-mono text-rose-300 mt-0.5">初段 · 1st Deg Black Belt</div>
+            </div>
+            <p class="text-[11px] text-zinc-400">Okinawan martial arts discipline & mental focus.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 2: SPEECH EMOTION RECOGNITION VISUAL LAB
+         ========================================== -->
+    <section id="ser-section" class="space-y-8 pt-10 border-t border-white/[0.08]">
+      
+      <div data-build-order="8" class="build-block space-y-2">
+        <div class="inline-flex flex-wrap items-center gap-2 font-mono text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 rounded-full">
+          <span>● UNDER REVIEW — SPRINGER NATURE</span>
+          <span>|</span>
+          <span>International Journal of Speech Technology (IJST)</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+          An Explainable Attention-Enhanced Deep Learning Framework for Speech Emotion Recognition on IESC
+        </h2>
+        <p class="text-sm text-zinc-400 max-w-4xl">
+          Addresses the scarcity of interpretable Speech Emotion Recognition on Indian speech by evaluating 10 deep architectures on the <strong class="text-zinc-200">Indian Emotional Speech Corpora (IESC — 600 utterances, 8 native North Indian speakers, 5 balanced classes: Angry, Fear, Happy, Neutral, Sad)</strong> using 68 handcrafted acoustic features and triple-layer XAI (SHAP, LIME, and Temporal Attention Heatmaps).
+        </p>
+      </div>
+
+      <div data-build-order="9" class="build-block bento-card p-6 rounded-3xl space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="font-mono text-xs text-cyan-400 uppercase font-bold">Fig. 1 · 8-Stage Proposed Explainable SER Architecture Pipeline</span>
+          <span class="font-mono text-xs text-zinc-400">Input Tensor: (150 × 68) · 80:20 Stratified Split</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 font-mono text-[11px]">
+          <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/10"><div class="text-cyan-400 font-bold">01. IESC Data</div><div class="text-zinc-400 text-[10px] mt-1">600 Utterances · 8 N. Indian Speakers</div></div>
+          <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/10"><div class="text-cyan-400 font-bold">02. Preprocess</div><div class="text-zinc-400 text-[10px] mt-1">Zero-Pad 150 steps · Z-Score Norm</div></div>
+          <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/10"><div class="text-cyan-400 font-bold">03. 68 Features</div><div class="text-zinc-400 text-[10px] mt-1">MFCC(40), Chroma(12), Contrast(7), Tonnetz(6)</div></div>
+          <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/10"><div class="text-cyan-400 font-bold">04. Matrix</div><div class="text-zinc-400 text-[10px] mt-1">150 × 68 Time-Frequency Representation</div></div>
+          <div class="p-3 rounded-2xl bg-white/[0.03] border border-white/10"><div class="text-cyan-400 font-bold">05. Split 80:20</div><div class="text-zinc-400 text-[10px] mt-1">480 Train / 120 Test Stratified</div></div>
+          <div class="p-3 rounded-2xl bg-indigo-500/15 border border-indigo-400/40"><div class="text-indigo-300 font-bold">06. 10 Models</div><div class="text-zinc-300 text-[10px] mt-1">CNN, LSTM, BiLSTM & Attention Hybrids</div></div>
+          <div class="p-3 rounded-2xl bg-emerald-500/15 border border-emerald-400/40"><div class="text-emerald-300 font-bold">07. Triple XAI</div><div class="text-zinc-300 text-[10px] mt-1">SHAP Global + LIME Local + Attn Maps</div></div>
+          <div class="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/40"><div class="text-amber-300 font-bold">08. Prediction</div><div class="text-zinc-300 text-[10px] mt-1">91.67% Top Acc (1D CNN + Attention)</div></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div data-build-order="10" class="build-block lg:col-span-7 bento-card p-6 rounded-3xl space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="font-mono text-xs text-cyan-400 uppercase font-bold">Table 1 & Fig. 3 · Complete 10-Architecture Benchmark</span>
+              <h3 class="text-lg font-bold text-white">Performance on IESC (Adam lr=0.0005, Batch=32, 70 Epochs)</h3>
+            </div>
+            <span class="font-mono text-xs px-2.5 py-1 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+              Winner: 1D CNN + Attention (91.67%)
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs">
+              <thead>
+                <tr class="border-b border-white/10 text-zinc-400 text-[11px]">
+                  <th class="py-2.5 pr-2">Model Architecture</th>
+                  <th class="py-2.5 px-2">Accuracy (%)</th>
+                  <th class="py-2.5 px-2">Precision (%)</th>
+                  <th class="py-2.5 px-2">Recall (%)</th>
+                  <th class="py-2.5 pl-2">F1-Score (%)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+                <tr class="bg-cyan-500/15 text-white font-bold">
+                  <td class="py-2.5 pr-2">1D CNN + Attention ★</td>
+                  <td class="py-2.5 px-2 text-cyan-300">91.67%</td>
+                  <td class="py-2.5 px-2">91.71%</td>
+                  <td class="py-2.5 px-2">91.67%</td>
+                  <td class="py-2.5 pl-2 text-emerald-300">91.64%</td>
+                </tr>
+                <tr><td class="py-2 pr-2">BiLSTM + Attention</td><td class="py-2 px-2">90.83%</td><td class="py-2 px-2">90.98%</td><td class="py-2 px-2">90.83%</td><td class="py-2 pl-2">90.83%</td></tr>
+                <tr><td class="py-2 pr-2">1D CNN + LSTM + Attention</td><td class="py-2 px-2">89.17%</td><td class="py-2 px-2">89.22%</td><td class="py-2 px-2">89.17%</td><td class="py-2 pl-2">89.16%</td></tr>
+                <tr><td class="py-2 pr-2">LSTM + Attention</td><td class="py-2 px-2">88.33%</td><td class="py-2 px-2">89.23%</td><td class="py-2 px-2">88.33%</td><td class="py-2 pl-2">88.45%</td></tr>
+                <tr><td class="py-2 pr-2">1D CNN + LSTM</td><td class="py-2 px-2">87.50%</td><td class="py-2 px-2">89.14%</td><td class="py-2 px-2">87.50%</td><td class="py-2 pl-2">87.71%</td></tr>
+                <tr><td class="py-2 pr-2">1D CNN + BiLSTM + Attention</td><td class="py-2 px-2">87.50%</td><td class="py-2 px-2">87.56%</td><td class="py-2 px-2">87.50%</td><td class="py-2 pl-2">87.45%</td></tr>
+                <tr><td class="py-2 pr-2">1D CNN + BiLSTM</td><td class="py-2 px-2">86.67%</td><td class="py-2 px-2">87.15%</td><td class="py-2 px-2">86.67%</td><td class="py-2 pl-2">86.65%</td></tr>
+                <tr><td class="py-2 pr-2">1D CNN (Baseline)</td><td class="py-2 px-2">85.83%</td><td class="py-2 px-2">86.20%</td><td class="py-2 px-2">85.83%</td><td class="py-2 pl-2">85.92%</td></tr>
+                <tr><td class="py-2 pr-2 text-zinc-400">BiLSTM (128 → 64 units)</td><td class="py-2 px-2 text-zinc-400">80.83%</td><td class="py-2 px-2 text-zinc-400">81.33%</td><td class="py-2 px-2 text-zinc-400">80.83%</td><td class="py-2 pl-2 text-zinc-400">80.85%</td></tr>
+                <tr><td class="py-2 pr-2 text-zinc-500">LSTM (Baseline)</td><td class="py-2 px-2 text-zinc-500">77.50%</td><td class="py-2 px-2 text-zinc-500">80.65%</td><td class="py-2 px-2 text-zinc-500">77.50%</td><td class="py-2 pl-2 text-zinc-500">77.89%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div data-build-order="11" class="build-block lg:col-span-5 bento-card p-6 rounded-3xl space-y-5 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-cyan-400 uppercase font-bold">Fig. 2 · Confusion Matrix (1D CNN + Attention)</span>
+              <span class="font-mono text-xs text-emerald-400">110 / 120 Test Correct</span>
+            </div>
+
+            <div class="grid grid-cols-6 gap-1.5 font-mono text-xs text-center items-center">
+              <div class="text-[10px] text-zinc-500 text-right pr-1">Act\Pred</div>
+              <div class="text-[10px] text-zinc-400">Angry</div>
+              <div class="text-[10px] text-zinc-400">Fear</div>
+              <div class="text-[10px] text-zinc-400">Happy</div>
+              <div class="text-[10px] text-zinc-400">Neutral</div>
+              <div class="text-[10px] text-zinc-400">Sad</div>
+
+              <div class="text-[10px] text-zinc-400 text-right pr-1">Angry</div>
+              <div class="cm-cell cm-high">21</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-low">1</div><div class="cm-cell cm-low">2</div><div class="cm-cell cm-zero">0</div>
+
+              <div class="text-[10px] text-zinc-400 text-right pr-1">Fear</div>
+              <div class="cm-cell cm-low">1</div><div class="cm-cell cm-high">23</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-zero">0</div>
+
+              <div class="text-[10px] text-zinc-400 text-right pr-1">Happy</div>
+              <div class="cm-cell cm-zero">0</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-high">21</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-low">3</div>
+
+              <div class="text-[10px] text-zinc-400 text-right pr-1">Neutral</div>
+              <div class="cm-cell cm-low">1</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-low">1</div><div class="cm-cell cm-high">22</div><div class="cm-cell cm-zero">0</div>
+
+              <div class="text-[10px] text-zinc-400 text-right pr-1">Sad</div>
+              <div class="cm-cell cm-zero">0</div><div class="cm-cell cm-low">1</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-zero">0</div><div class="cm-cell cm-high">23</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-black/60 border border-white/[0.07] space-y-2.5">
+            <div class="flex justify-between items-center font-mono text-[11px]">
+              <span class="text-amber-300 font-bold">Fig. 5 · SHAP Global Beeswarm Top Features</span>
+              <span class="text-zinc-500">|SHAP Value| Impact</span>
+            </div>
+            <div class="space-y-1.5 font-mono text-[10px]">
+              <div class="flex items-center gap-2"><span class="w-10 text-zinc-300">F6</span><div class="flex-1 h-2 rounded bg-gradient-to-r from-blue-500 via-purple-500 to-rose-500"></div><span class="text-rose-400">High</span></div>
+              <div class="flex items-center gap-2"><span class="w-10 text-zinc-300">F9</span><div class="w-[88%] h-2 rounded bg-gradient-to-r from-blue-500 via-purple-500 to-rose-500"></div><span class="text-rose-400">0.42</span></div>
+              <div class="flex items-center gap-2"><span class="w-10 text-zinc-300">F20</span><div class="w-[79%] h-2 rounded bg-gradient-to-r from-blue-500 via-purple-500 to-rose-500"></div><span class="text-amber-300">0.36</span></div>
+              <div class="flex items-center gap-2"><span class="w-10 text-zinc-300">F10</span><div class="w-[72%] h-2 rounded bg-gradient-to-r from-blue-500 via-purple-500 to-rose-500"></div><span class="text-amber-300">0.31</span></div>
+              <div class="flex items-center gap-2"><span class="w-10 text-zinc-300">F19</span><div class="w-[65%] h-2 rounded bg-gradient-to-r from-blue-500 via-purple-500 to-rose-500"></div><span class="text-cyan-300">0.28</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div data-build-order="12" class="build-block bento-card p-6 sm:p-7 rounded-3xl space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="font-mono text-xs text-cyan-400 uppercase font-bold">Figs. 6 & 7 · Interactive Local LIME & Temporal Attention Heatmap Explorer</span>
+            <h3 class="text-lg font-bold text-white">Select an Emotion Class to Inspect Instance-Level Feature Weights & 150-Step Attention</h3>
+          </div>
+          <div class="flex flex-wrap gap-2 font-mono text-xs">
+            <button onclick="selectSerEmotion('fear')" data-emo="fear" class="emo-tab active-emo">Fear (Fig. 6a/7a)</button>
+            <button onclick="selectSerEmotion('anger')" data-emo="anger" class="emo-tab">Anger (Fig. 6b/7b)</button>
+            <button onclick="selectSerEmotion('neutral')" data-emo="neutral" class="emo-tab">Neutral (Fig. 6c/7c)</button>
+            <button onclick="selectSerEmotion('sad')" data-emo="sad" class="emo-tab">Sad (Fig. 6d/7d)</button>
+            <button onclick="selectSerEmotion('happy')" data-emo="happy" class="emo-tab">Happy (Fig. 6e/7e)</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="p-5 rounded-2xl bg-black/65 border border-white/[0.07] space-y-3">
+            <div id="lime-title" class="font-mono text-xs text-emerald-400 font-bold">LIME Local Explanation — Fear Class</div>
+            <div id="lime-bars" class="space-y-2.5 font-mono text-xs"></div>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-black/65 border border-white/[0.07] flex flex-col justify-between space-y-3">
+            <div>
+              <div class="font-mono text-xs text-cyan-400 font-bold">Temporal Attention Weight Distribution (150 Time Steps)</div>
+              <p id="attn-desc" class="text-xs text-zinc-400 mt-1"></p>
+            </div>
+            <div id="attn-heatmap-strip" class="h-24 flex items-end gap-1 pt-2 border-b border-white/10"></div>
+            <div class="flex justify-between font-mono text-[10px] text-zinc-500">
+              <span>Frame t = 0</span>
+              <span>Emotionally Salient Temporal Peaks (α_t)</span>
+              <span>Frame t = 150</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         SECTION 3: FLORA PLANT DISEASE VISUAL LAB
+         ========================================== -->
+    <section id="flora-section" class="space-y-8 pt-10 border-t border-white/[0.08]">
+      
+      <div data-build-order="13" class="build-block space-y-2">
+        <div class="inline-flex flex-wrap items-center gap-2 font-mono text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1 rounded-full">
+          <span>● CO-AUTHORED RESEARCH MANUSCRIPT</span>
+          <span>|</span>
+          <span>Amity Institute of Information Technology, Jaipur</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+          FLORA: Framework for Leaf Observation and Recognition Analysis (PlantVillage 38-Class Study)
+        </h2>
+        <p class="text-sm text-zinc-400 max-w-4xl">
+          Authors: Pawan Manghnani, Tarun Yadav, Priyanshi Joshi, <strong class="text-white">Nishant Kumar Hati</strong>, Manju Kaushik. Controlled comparison of five architectures on <strong class="text-zinc-200">54,305 RGB images across 38 classes</strong> (stratified 20% subset, 70/15/15 split, 160×160 resolution, class-weighted Adam optimization) with qualitative <strong class="text-zinc-200">Grad-CAM localization and failure-case analysis</strong>.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div data-build-order="14" class="build-block lg:col-span-7 bento-card p-6 rounded-3xl space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span class="font-mono text-xs text-emerald-400 uppercase font-bold">Table 3 & Fig. 4 · Controlled 5-Model Test Evaluation</span>
+              <h3 class="text-lg font-bold text-white">Accuracy, Macro/Weighted F1 & Test Loss Across 38 Leaf Classes</h3>
+            </div>
+            <span class="font-mono text-xs px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+              ResNet50: 95.15% Acc · 0.189 Loss
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs">
+              <thead>
+                <tr class="border-b border-white/10 text-zinc-400 text-[11px]">
+                  <th class="py-2.5 pr-2">Model</th>
+                  <th class="py-2.5 px-2">Accuracy</th>
+                  <th class="py-2.5 px-2">Macro P</th>
+                  <th class="py-2.5 px-2">Macro R</th>
+                  <th class="py-2.5 px-2">Macro F1</th>
+                  <th class="py-2.5 px-2">Weighted F1</th>
+                  <th class="py-2.5 pl-2">Test Loss</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/[0.05] text-zinc-300">
+                <tr class="bg-emerald-500/15 text-white font-bold">
+                  <td class="py-3 pr-2">ResNet50 ★</td>
+                  <td class="py-3 px-2 text-emerald-300">95.15%</td>
+                  <td class="py-3 px-2">92.21%</td>
+                  <td class="py-3 px-2">94.93%</td>
+                  <td class="py-3 px-2 text-cyan-300">92.98%</td>
+                  <td class="py-3 px-2">95.23%</td>
+                  <td class="py-3 pl-2 text-emerald-300">0.189</td>
+                </tr>
+                <tr><td class="py-2.5 pr-2">MobileNetV2</td><td class="py-2.5 px-2">93.43%</td><td class="py-2.5 px-2">90.11%</td><td class="py-2.5 px-2">93.05%</td><td class="py-2.5 px-2">90.95%</td><td class="py-2.5 px-2">93.34%</td><td class="py-2.5 pl-2">0.230</td></tr>
+                <tr><td class="py-2.5 pr-2">EfficientNetB0</td><td class="py-2.5 px-2">92.14%</td><td class="py-2.5 px-2">88.14%</td><td class="py-2.5 px-2">91.60%</td><td class="py-2.5 px-2">89.34%</td><td class="py-2.5 px-2">92.12%</td><td class="py-2.5 pl-2">0.361</td></tr>
+                <tr><td class="py-2.5 pr-2">DenseNet121</td><td class="py-2.5 px-2">91.34%</td><td class="py-2.5 px-2">87.76%</td><td class="py-2.5 px-2">90.73%</td><td class="py-2.5 px-2">88.39%</td><td class="py-2.5 px-2">91.40%</td><td class="py-2.5 pl-2">0.336</td></tr>
+                <tr><td class="py-2.5 pr-2 text-zinc-400">Custom CNN (V2)</td><td class="py-2.5 px-2 text-zinc-400">82.57%</td><td class="py-2.5 px-2 text-zinc-400">83.54%</td><td class="py-2.5 px-2 text-zinc-400">76.00%</td><td class="py-2.5 px-2 text-zinc-400">76.38%</td><td class="py-2.5 px-2 text-zinc-400">82.09%</td><td class="py-2.5 pl-2 text-rose-400">0.610</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-black/60 border border-white/[0.07] space-y-2 font-mono text-xs">
+            <div class="flex justify-between text-[11px] text-zinc-400">
+              <span>Fig. 2 · PlantVillage Class Imbalance Distribution (Mean: 1,429.08 imgs/class)</span>
+              <span class="text-amber-300">Ratio ≈ 36 : 1</span>
+            </div>
+            <div class="space-y-1.5 text-[11px]">
+              <div class="flex items-center gap-2"><span class="w-44 truncate text-zinc-300">Orange Huanglongbing (Max)</span><div class="flex-1 h-2 bg-emerald-400 rounded"></div><span class="text-emerald-300">5,507</span></div>
+              <div class="flex items-center gap-2"><span class="w-44 truncate text-zinc-300">Tomato Yellow Leaf Curl</span><div class="w-[92%] h-2 bg-cyan-400 rounded"></div><span class="text-cyan-300">5,357</span></div>
+              <div class="flex items-center gap-2"><span class="w-44 truncate text-zinc-300">Soybean Healthy</span><div class="w-[86%] h-2 bg-sky-400 rounded"></div><span class="text-sky-300">5,090</span></div>
+              <div class="flex items-center gap-2"><span class="w-44 truncate text-zinc-400">Potato Healthy (Min)</span><div class="w-[5%] h-2 bg-rose-400 rounded"></div><span class="text-rose-400">152</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div data-build-order="15" class="build-block lg:col-span-5 bento-card p-6 rounded-3xl flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <span class="font-mono text-xs text-emerald-400 uppercase font-bold">Fig. 5 · Interactive Grad-CAM Heatmap Visualizer</span>
+            <h3 class="text-lg font-bold text-white">ResNet50 Activation Overlay & Failure Audit</h3>
+
+            <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
+              <button onclick="selectFloraCase(0)" class="flora-tab active-flora text-left p-2.5 rounded-xl border">01. Maize Rust (99.9%)</button>
+              <button onclick="selectFloraCase(1)" class="flora-tab text-left p-2.5 rounded-xl border">02. Tomato Spot (70.2%)</button>
+              <button onclick="selectFloraCase(2)" class="flora-tab text-left p-2.5 rounded-xl border">03. Citrus Green (99.6%)</button>
+              <button onclick="selectFloraCase(3)" class="flora-tab text-left p-2.5 rounded-xl border">04. Apple Error (30.5%)</button>
+            </div>
+          </div>
+
+          <div id="flora-case-display" class="p-4 rounded-2xl bg-black/70 border border-white/[0.08] space-y-3 font-mono text-xs"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 4: APPLIED ML PRACTICALS & WEB SYSTEMS
+         ========================================== -->
+    <section id="ml-section" class="space-y-8 pt-10 border-t border-white/[0.08]">
+      <div data-build-order="16" class="build-block flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span class="font-mono text-xs text-cyan-400 uppercase tracking-widest">04 // OPEN-SOURCE REPOSITORIES & PRACTICAL IMPLEMENTATIONS</span>
+          <h2 class="text-3xl sm:text-4xl font-black text-white mt-1">Applied Machine Learning & Web Systems</h2>
+        </div>
+        <a href="https://github.com/nishanthati14-ctrl" target="_blank" class="font-mono text-xs text-cyan-300 hover:underline">
+          github.com/nishanthati14-ctrl ↗
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div data-build-order="17" class="build-block bento-card p-6 rounded-3xl flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <span class="font-mono text-[10px] px-2.5 py-1 rounded bg-cyan-500/15 text-cyan-300">SUPERVISED & ENSEMBLE ML</span>
+            <h3 class="text-lg font-bold text-white">Regression, KNN, Naive Bayes & Random Forests</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Practical implementations in Python covering Linear & Logistic Regression, K-Nearest Neighbors (KNN), Naive Bayes classifiers, Decision Trees, and Random Forest ensembles with full evaluation pipelines.
+            </p>
+          </div>
+          <a href="https://github.com/nishanthati14-ctrl" target="_blank" class="font-mono text-xs text-cyan-400 hover:underline pt-2 border-t border-white/[0.06]">
+            Inspect ML Practicals Repository →
+          </a>
+        </div>
+
+        <div data-build-order="18" class="build-block bento-card p-6 rounded-3xl flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <span class="font-mono text-[10px] px-2.5 py-1 rounded bg-indigo-500/15 text-indigo-300">UNSUPERVISED & VISION LAB</span>
+            <h3 class="text-lg font-bold text-white">Eye Image Classification & Clustering</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Computer vision classification pipelines for ocular/eye image datasets alongside K-Means and hierarchical unsupervised clustering algorithms implemented in VS Code.
+            </p>
+          </div>
+          <a href="https://github.com/nishanthati14-ctrl" target="_blank" class="font-mono text-xs text-indigo-400 hover:underline pt-2 border-t border-white/[0.06]">
+            View Vision & Clustering Code →
+          </a>
+        </div>
+
+        <div data-build-order="19" class="build-block bento-card p-6 rounded-3xl flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <span class="font-mono text-[10px] px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-300">FULL-STACK INSTITUTIONAL WEB</span>
+            <h3 class="text-lg font-bold text-white">Shanti Global Academy Web Platform</h3>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Designed and developed the official web portal for Shanti Global Academy, delivering responsive admissions tracking, academic announcements, and student-faculty portals.
+            </p>
+          </div>
+          <a href="https://github.com/nishanthati14-ctrl/Shanti-Global-Academy" target="_blank" class="font-mono text-xs text-emerald-400 hover:underline pt-2 border-t border-white/[0.06]">
+            Open Shanti-Global-Academy Repo →
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 5: DEXA FOUNDING LEADERSHIP & SHODAN KARATE
+         ========================================== -->
+    <section id="leadership-section" class="space-y-8 pt-10 border-t border-white/[0.08]">
+      <div data-build-order="20" class="build-block">
+        <span class="font-mono text-xs text-cyan-400 uppercase tracking-widest">05 // LEADERSHIP, EDUCATION & MARTIAL ARTS</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mt-1">Academic Community & Personal Discipline</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div data-build-order="21" class="build-block bento-card p-7 rounded-3xl space-y-3">
+          <span class="font-mono text-[10px] px-2.5 py-1 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">FOUNDING LEADERSHIP</span>
+          <h3 class="text-xl font-bold text-white">Founding General Coordinator — DEXA Club</h3>
+          <p class="font-mono text-xs text-indigo-300">Data Exploration & Analytics Club · Amity University Rajasthan</p>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+            Co-founded the Data Exploration & Analytics (DEXA) Club at Amity University Rajasthan from the ground up, spearheading the roadmap for upcoming technical workshops, peer research cohorts, and university-wide data science initiatives.
+          </p>
+        </div>
+
+        <div data-build-order="22" class="build-block bento-card p-7 rounded-3xl space-y-3">
+          <span class="font-mono text-[10px] px-2.5 py-1 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30">OKINAWAN MARTIAL ARTS</span>
+          <h3 class="text-xl font-bold text-white">Shodan (初段) — 1st Degree Black Belt</h3>
+          <p class="font-mono text-xs text-rose-300">Traditional Okinawan Goju-Ryu Karate</p>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+            Achieved the rank of Shodan (1st Degree Black Belt) in Okinawan Goju-Ryu Karate. Martial arts training underpins my approach to deep learning research: disciplined iteration, composure, and relentless consistency.
+          </p>
+        </div>
+
+        <div data-build-order="23" class="build-block bento-card p-7 rounded-3xl space-y-3">
+          <span class="font-mono text-[10px] px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">ACADEMIC CREDENTIALS</span>
+          <h3 class="text-xl font-bold text-white">M.Sc. in Data Science & BCA</h3>
+          <p class="font-mono text-xs text-emerald-300">Amity University Rajasthan, Jaipur · ORCID Verified</p>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+            Pursuing M.Sc. in Data Science following a Bachelor of Computer Applications (BCA), building a rigorous foundation across machine learning theory, acoustic & visual feature engineering, and Explainable AI.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Minimalist Footer -->
+  <footer class="border-t border-white/[0.07] bg-[#020204] py-10 px-4 text-center font-mono text-xs text-zinc-500 relative z-10">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>NISHANT KUMAR HATI · AI & DEEP LEARNING RESEARCHER · JAIPUR, INDIA</div>
+      <div class="flex flex-wrap justify-center gap-5 text-zinc-400">
+        <a href="https://orcid.org/0009-0008-1336-3544" target="_blank" class="hover:text-cyan-300">ORCID: 0009-0008-1336-3544</a>
+        <a href="https://github.com/nishanthati14-ctrl" target="_blank" class="hover:text-cyan-300">GitHub</a>
+        <a href="https://www.linkedin.com/in/nishant-kumar-hati-416b7b296" target="_blank" class="hover:text-cyan-300">LinkedIn</a>
+        <a href="mailto:nishanthati14@gmail.com" class="hover:text-cyan-300">nishanthati14@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom Script -->
+  <script src="js/script.js"></script>
+</body>
+</html>
